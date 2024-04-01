@@ -1,0 +1,163 @@
+body{
+    height: 100vh;
+    width: 100vw;
+    max-width: -webkit-fill-available;
+    max-height: -webkit-fill-available;
+    margin: 0 0;
+    display: flex;
+    flex-direction: row;
+    background-color: #181818;
+    user-select: none;
+    font-family:DFKai-sb,"Microsoft JhengHei";
+    box-sizing: border-box;
+}
+
+#main-viwe{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow-x: hidden;
+}
+
+.page{
+    height: 100%;
+    min-width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s; 
+}
+
+
+
+/* -----------p1-------------- */
+.wooden-fish{
+    width: 50vw;
+    max-width: 600px;
+    height: 50vw;
+    max-height: 600px;
+    /* height: 300px; */
+    background-image: url("../img/2.png");
+    background-size: cover;
+
+    /* border: red solid 1px; */
+    transition: all 0.2s;
+    position: relative;
+    top:-5%;
+    user-select: none;
+}
+.stick{
+    width: 60%;
+    /* border: red solid 1px; */
+    transition: all 0.1s; 
+    transform-origin: 0px 100%;
+    position:absolute;
+    left:30px;
+    top:30px;
+}
+.stick-hit{
+    transform: rotate(16deg);
+}
+
+.Merit-text{
+    font-size: 2rem;
+    font-weight: bold;
+    color: red;
+    transition: all 1s; 
+    display: none;
+}
+.Merit-text-show{
+    transform: translateY(-100px);
+    opacity: 0;
+    user-select: none;
+}
+.point{
+    color: red;
+    font-size: 3rem;
+    user-select: none;
+}
+
+
+/* -----------p2-------------- */
+#p-2{
+    background-color: #181818;
+}
+.reset-bnt{
+    width: 700px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.reset-bnt .bg{
+    width: 100%;
+    position: absolute;
+}
+.reset-bnt .title{
+    position: relative;
+    color: #eab964;
+    font-size: 5em;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* -----------change page-------------- */
+.out-page{
+    transform: translateX(-100%);
+}
+.in-page{
+    transform: translateX(-100%);
+}
+
+@media only screen and (max-width: 600px)  {
+    .wooden-fish{
+    width: 80vw;
+    height: 80vw;
+    }
+    .reset-bnt{
+        width: 80%;
+    }
+
+    .reset-bnt .title{
+        font-size: 2em;
+    }
+
+
+    .stick{
+        width: 55%;
+        /* border: red solid 1px; */
+        transition: all 0.05s; 
+        transform-origin: 0px 100%;
+        position:absolute;
+        left:20px;
+        top:30px;    
+    }
+}
+
+
+@media only screen and (max-width: 390px)  {
+    .wooden-fish{
+    width: 90vw;
+    height: 90vw;
+    }
+    .stick{
+        width: 55%;
+        /* border: red solid 1px; */
+        transition: all 0.05s; 
+        transform-origin: 0px 100%;
+        position:absolute;
+        left:20px;
+        top:30px;    
+    }
+
+    .reset-bnt{
+        width: 10%;
+    }
+
+    .reset-bnt .title{
+        font-size: 1em;
+    }
+
+}
