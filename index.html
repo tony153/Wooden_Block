@@ -4,10 +4,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 20px;
+            user-select: none;
+            z-index: 1000;
+            pointer-events: none;
+            animation: fall linear;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    </style>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
     <script src="js/hammer.min.js"></script>
-    <title>Merit</title>
+    <title>Christmas Merit</title>
 </head>
 <body>
     <div id="main-viwe">
@@ -29,7 +50,153 @@
         </div>
     </div>
 
+    <script>
+        var m_x = 0;
+        var m_y = 0;
+        var point = 0;
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth(); // 0 = January, 11 = December
 
-    <script src="js/main.js"></script>
+        const christmasSounds = [
+            { note: 'C4', duration: 200 },
+            { note: 'E4', duration: 200 },
+            { note: 'G4', duration: 200 },
+            { note: 'C5', duration: 200 },
+            { note: 'D4', duration: 200 }, 
+            { note: 'F4', duration: 200 }, 
+            { note: 'A4', duration: 200 }, 
+            { note: 'B4', duration: 200 }
+        ];
+
+        let currentNoteIndex = 0;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playNote(frequency, duration) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        const noteFrequencies = {
+            'C4': 261.63,
+            'E4': 329.63,
+            'G4': 392.00,
+            'C5': 523.25,
+            'D4': 293.66, 
+            'F4': 349.23,
+            'A4': 440.00,
+            'B4': 493.88,
+            'G5': 784.00
+        };
+
+        function createSnowflake() {
+            if (currentMonth >= 10 || currentMonth <= 2) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = '❄';
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                snowflake.style.opacity = Math.random();
+                document.body.appendChild(snowflake);
+
+                setTimeout(() => {
+                    snowflake.remove();
+                }, 5000);
+            }
+        }
+
+        setInterval(createSnowflake, 200);
+
+        var merit_point = localStorage.getItem("merit_point");
+        if (merit_point !== null){
+            console.log(merit_point)
+            $(".point>span").html(merit_point);
+        }
+
+        point = merit_point;
+
+        $("body").mousemove(function(e) {
+            m_x = e.pageX;
+            m_y = e.pageY;
+        });
+
+        $("#p-1").on("click",function(){
+            let clone_text= $(".wooden-fish .Merit-text").clone(true).appendTo("body");
+            point++;
+            $(".point>span").html(point);
+            localStorage.setItem("merit_point", point);
+            
+            playNote(noteFrequencies[christmasSounds[currentNoteIndex].note], 
+                    christmasSounds[currentNoteIndex].duration);
+            currentNoteIndex = (currentNoteIndex + 1) % christmasSounds.length;
+
+            for(let i = 0; i < 3; i++) {
+                createSnowflake();
+            }
+            
+            clone_text.show().css({top:(m_y-50), left: (m_x-50), position:'absolute'});
+            setTimeout(function(){
+                clone_text.addClass("Merit-text-show")
+            }, 1);
+            setTimeout(function(){
+                clone_text.remove();
+            }, 1001);
+
+            $(".wooden-fish>img").addClass("stick-hit")
+            setTimeout(function(){
+                $(".wooden-fish>img").removeClass("stick-hit")
+            }, 100);
+        });
+
+        var page1 = document.querySelector('#p-1');
+        var page2 = document.querySelector('#p-2');
+        var mc1 = new Hammer(page1);
+        var mc2 = new Hammer(page2);
+        var distance_of_long = 120;
+
+        mc1.get('swipe').set({ direction: Hammer.DIRECTION_ALL, pointers: 1 });
+
+        mc1.on("panleft", function(ev) {
+            var distance = ev.distance;
+            if(distance >distance_of_long){
+                $("#p-2").removeClass('out-page');
+                $("#p-1").removeClass('in-page');
+                if (ev.pointers.length === 1) {
+                    $("#p-1").addClass('out-page');
+                    $("#p-2").addClass('in-page');
+                }
+            }
+        });
+
+        mc2.get('swipe').set({ direction: Hammer.DIRECTION_ALL, pointers: 1 });
+
+        mc2.on("panright", function(ev) {
+            var distance = ev.distance;
+            if(distance >distance_of_long) {
+                $("#p-1").removeClass('out-page');
+                $("#p-2").removeClass('in-page');
+            }
+        });
+
+        $("#p-2 .reset-bnt").on('click',function(){
+            $("#p-1").removeClass('out-page');
+            $("#p-2").removeClass('in-page');
+
+            $("#p-1 .point span").text("0");
+            localStorage.setItem("merit_point", 0);
+        });
+    </script>
 </body>
 </html>
