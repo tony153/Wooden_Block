@@ -54,69 +54,67 @@
         var m_x = 0;
         var m_y = 0;
         var point = 0;
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth(); // 0 = January, 11 = December
 
-        christmasSounds = [
-            { note: 'G4', duration: 300 },
-            { note: 'C5', duration: 300 },
-            { note: 'C5', duration: 300 },
-            { note: 'D5', duration: 300 },
-            { note: 'C5', duration: 300 },
-            { note: 'B4', duration: 300 },
-            { note: 'A4', duration: 300 },
-            { note: 'G4', duration: 300 }
+        const christmasSounds = [
+            { note: 'C4', duration: 200 },
+            { note: 'E4', duration: 200 },
+            { note: 'G4', duration: 200 },
+            { note: 'C5', duration: 200 },
+            { note: 'D4', duration: 200 }, 
+            { note: 'F4', duration: 200 }, 
+            { note: 'A4', duration: 200 }, 
+            { note: 'B4', duration: 200 }
         ];
+
         let currentNoteIndex = 0;
+
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         function playNote(frequency, duration) {
-            const oscillator1 = audioContext.createOscillator();
-            const oscillator2 = audioContext.createOscillator();
+            const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            oscillator1.type = 'sine';
-            oscillator1.frequency.value = frequency;
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
             
-            oscillator2.type = 'triangle';
-            oscillator2.frequency.value = frequency * 2;
-            
-            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
             
-            oscillator1.connect(gainNode);
-            oscillator2.connect(gainNode);
+            oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator1.start();
-            oscillator2.start();
-            oscillator1.stop(audioContext.currentTime + duration / 1000);
-            oscillator2.stop(audioContext.currentTime + duration / 1000);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration / 1000);
         }
 
         const noteFrequencies = {
+            'C4': 261.63,
+            'E4': 329.63,
             'G4': 392.00,
+            'C5': 523.25,
+            'D4': 293.66, 
+            'F4': 349.23,
             'A4': 440.00,
             'B4': 493.88,
-            'C5': 523.25,
-            'D5': 587.33,
-            'E5': 659.25,
-            'F5': 698.46,
-            'G5': 783.99,
-            'A5': 880.00
+            'G5': 784.00
         };
 
-
         function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
-            snowflake.textContent = '❄';
-            snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-            snowflake.style.opacity = Math.random();
-            document.body.appendChild(snowflake);
+            if (currentMonth >= 10 || currentMonth <= 2) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = '❄';
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                snowflake.style.opacity = Math.random();
+                document.body.appendChild(snowflake);
 
-            setTimeout(() => {
-                snowflake.remove();
-            }, 5000);
+                setTimeout(() => {
+                    snowflake.remove();
+                }, 5000);
+            }
         }
 
         setInterval(createSnowflake, 200);
