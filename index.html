@@ -15,6 +15,16 @@
             pointer-events: none;
             animation: fall linear;
         }
+        .Redpack{
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 40px;
+            user-select: none;
+            z-index: 1000;
+            pointer-events: none;
+            animation: fall linear;
+        }
 
         @keyframes fall {
             0% {
@@ -50,6 +60,7 @@
         </div>
     </div>
 
+
     <script>
         var m_x = 0;
         var m_y = 0;
@@ -57,6 +68,51 @@
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth(); // 0 = January, 11 = December
 
+
+        //一般音效
+        const SE = {
+            hit: {
+                path: 'audio/hit.mp3',
+                type: 'audio/mp3',
+                duration: 900,
+                volume: 0.75,
+            },
+        }
+        const seList = [];
+        for (let i = 0; i < 20; i++) {
+            const audioElement = document.createElement('audio');
+            document.body.appendChild(audioElement);
+            seList.push({
+                dom: audioElement,
+                finishTime: 0,
+            });
+        }
+        const broadcastSe = (se) => {
+            // 获取当前时间
+            const now = new Date().getTime();
+            // 判断是否需要防抖处理（同一个类型的音效、且播放时间差小于80ms）
+            const sameItem = seList.find((item) => item.dom.getAttribute('src') === se.path && Math.abs(item.finishTime - now - se.duration) < 80);
+            // 相同音效，就把音量加大，最大值为1，并结束函数。
+            if (sameItem) {
+                sameItem.dom.volume = Math.min(sameItem.dom.volume + 0.1, 1);
+                return;
+            }
+            // 不同音效，寻找空闲的audio，要求dom的finishTime小于现在时间戳，说明它是空闲的
+            const potentialDom = seList.find((item) => item.finishTime < now);
+            if (potentialDom) {
+                potentialDom.dom.setAttribute('src', se.path);
+                potentialDom.dom.setAttribute('type', se.type);
+                potentialDom.dom.volume = se.volume;
+                potentialDom.finishTime = now + se.duration;
+                // 这里要等src设置完毕后，加载好音效后再播放。所以注册了一个延迟执行的任务。否则，会播放旧的src资源
+                setTimeout(() => potentialDom.dom.play(), 0);
+            } else {
+                console.log('资源不足，无法播放', se.path);
+            }
+        };
+
+
+        //聖誕節音效
         const christmasSounds = [
             { note: 'C4', duration: 200 },
             { note: 'E4', duration: 200 },
@@ -101,8 +157,8 @@
             'G5': 784.00
         };
 
+        //聖誕節下雪
         function createSnowflake() {
-            if (currentMonth >= 10 || currentMonth <= 2) {
                 const snowflake = document.createElement('div');
                 snowflake.className = 'snowflake';
                 snowflake.textContent = '❄';
@@ -114,17 +170,38 @@
                 setTimeout(() => {
                     snowflake.remove();
                 }, 5000);
-            }
+        }
+        
+        if (currentMonth >= 10 || currentMonth <= 2) {
+            setInterval(createSnowflake, 200);
         }
 
-        setInterval(createSnowflake, 200);
+        //春節下紅包
+        function createRedpack() {
+                const Redpack = document.createElement('div');
+                Redpack.className = 'Redpack';
+                Redpack.textContent = '🧧';
+                Redpack.style.fontSize = (Math.floor(Math.random() * (40 - 15 + 1)) + 15) + "px";
+                Redpack.style.left = Math.random() * 100 + 'vw';
+                Redpack.style.animationDuration = Math.random() * 3 + 2 + 's';
+                Redpack.style.opacity = Math.random();
+                document.body.appendChild(Redpack);
 
+                setTimeout(() => {
+                    Redpack.remove();
+                }, 5000);
+        }
+        if (currentMonth >= 11 || currentMonth <= 2) {
+            setInterval(createRedpack, 300);
+        }
+
+
+        //檢查本地儲存是否有 功德點
         var merit_point = localStorage.getItem("merit_point");
         if (merit_point !== null){
             console.log(merit_point)
             $(".point>span").html(merit_point);
         }
-
         point = merit_point;
 
         $("body").mousemove(function(e) {
@@ -132,19 +209,29 @@
             m_y = e.pageY;
         });
 
+        //當用戶點擊介面
         $("#p-1").on("click",function(){
             let clone_text= $(".wooden-fish .Merit-text").clone(true).appendTo("body");
             point++;
+            //修改介面顯示數量
             $(".point>span").html(point);
+            //修改本地儲存變量
             localStorage.setItem("merit_point", point);
             
-            playNote(noteFrequencies[christmasSounds[currentNoteIndex].note], 
-                    christmasSounds[currentNoteIndex].duration);
-            currentNoteIndex = (currentNoteIndex + 1) % christmasSounds.length;
+            //播放音效
 
-            for(let i = 0; i < 3; i++) {
-                createSnowflake();
+            if (currentMonth >= 10 || currentMonth <= 2) {
+                playNote(noteFrequencies[christmasSounds[currentNoteIndex].note], 
+                   christmasSounds[currentNoteIndex].duration);
+                currentNoteIndex = (currentNoteIndex + 1) % christmasSounds.length;
+
+                for(let i = 0; i < 3; i++) {
+                    createSnowflake();
+                }
+            }else{
+                broadcastSe(SE.hit);
             }
+
             
             clone_text.show().css({top:(m_y-50), left: (m_x-50), position:'absolute'});
             setTimeout(function(){
@@ -160,6 +247,7 @@
             }, 100);
         });
 
+        //换頁
         var page1 = document.querySelector('#p-1');
         var page2 = document.querySelector('#p-2');
         var mc1 = new Hammer(page1);
@@ -196,6 +284,13 @@
 
             $("#p-1 .point span").text("0");
             localStorage.setItem("merit_point", 0);
+            var merit_point = localStorage.getItem("merit_point");
+            if (merit_point !== null){
+                console.log(merit_point)
+                $(".point>span").html(merit_point);
+            }
+            point = merit_point;
+
         });
     </script>
 </body>
