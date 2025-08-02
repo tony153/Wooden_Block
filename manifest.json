@@ -1,15 +1,20 @@
 {
   "name": "木魚",
   "short_name": "木魚",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#deb887",
+  "theme_color": "#181818",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "./img/17144605kmuj.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./img/17144605kmuj.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
